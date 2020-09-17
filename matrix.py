@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-""" Run and process an sbatch job on all pairs of nodes in a cluster.
+""" Run and process an sbatch job on all pairs of nodes in a Slurm cluster.
 
     Usage:
         ./matrix.py run TEMPLATE
-        ./matrix.py read TEMPLATE SCRIPT
+        ./matrix.py read TEMPLATE POSTPROCESS
     # TODO: add script options/arguments
 """
 

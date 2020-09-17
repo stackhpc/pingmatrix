@@ -1,18 +1,26 @@
-Run an MPI job (e.g. IMB PingPong) on all pairs of nodes in a Slurm cluster.
+Run and process an sbatch job on all pairs of nodes in a Slurm cluster.
 
 # Usage:
 
-1. Modify a template script to suit your need, e.g. see`ping-ib.tpl`:
-    - The following keys are provided for `{interpolation}`:
-        - `template_file`: the name of the template file, excluding any directory components
-        - `exclude_nodes`: should be used to create an `#SBATCH --exclude=` directive to control which nodes are used
-    - It should extract the variable(s) to measure in some grep-able format - this uses `readping.py` to extract zero-size message latency and maximum bandwidth.
+1. Create an sbatch script template - see `ping-ib.tpl` for an example. It MUST contain:
 
+    #SBATCH --exclude={exclude_nodes}
+    #SBATCH --output={output}
+    #SBATCH --error={error}
+
+    It may also include `{template_file}` to record the template file name in the generated files.
+    
 1. Run
 
-        python runping.py <template_path>
+        ./matrix run <template_path>
 
-    This will launch a job for each pair of nodes.
+    where `<template_path>` is the template created above.
+
+    e.g.:
+
+        ./matrix run ping-ib.tpl
+
+    This will create an sbatch script and submit it for each pair of nodes. It will also create a `.nodemap` file needed for postprocessing.
 
 1. Use something like:
 
@@ -20,4 +28,20 @@ Run an MPI job (e.g. IMB PingPong) on all pairs of nodes in a Slurm cluster.
 
     To monitor how many jobs are left in the queue.
 
-1. Grep for your results marker.
+1. Once finished, run:
+
+        ./matrix read <template_path> <postprocess>
+
+    where `<template_path>` is as above and `<postprocess>` is the path to an executable to postprocess run output.
+
+    e.g.:
+
+        ./matrix.py read ping-ib.tpl ./imb-stats.py
+    
+    This executable must:
+    - Take the path to a file containing stdout from an `sbatch` script as its first argument.
+    - Output a result to stdout.
+    
+    A comma-separated table of results will be output.
+
+    **NB** sorting of results assumes nodenames have integer numeric components.
