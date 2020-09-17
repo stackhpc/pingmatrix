@@ -5,8 +5,8 @@
 #SBATCH --time=0:10:0
 #SBATCH --exclusive
 #SBATCH --exclude={exclude_nodes}
-#SBATCH --output=%x.out
-#SBATCH --error=%x.err
+#SBATCH --output={output}
+#SBATCH --error={error}
 
 nodes=$(scontrol show hostnames $SLURM_JOB_NODELIST)
 module load gcc/9.3.0-5abm3xg
@@ -15,4 +15,3 @@ export SLURM_MPI_TYPE=pmix_v2
 export UCX_NET_DEVICES=mlx5_0:1
 module load intel-mpi-benchmarks/2019.5-dwg5q6j
 srun IMB-MPI1 pingpong
-echo "Results:" $nodes $(python readping.py $SLURM_JOB_NAME.out)
