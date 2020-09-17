@@ -3,8 +3,7 @@
 
     Usage:
         ./matrix.py run TEMPLATE
-        ./matrix.py read TEMPLATE POSTPROCESS
-    # TODO: add script options/arguments
+        ./matrix.py read TEMPLATE POSTPROCESS [POSTPROCESS_ARGS ...]
 """
 
 __version__ = '0.0'
@@ -50,7 +49,7 @@ def run(template_file):
     with open('%s.nodemap' % template_name, 'w') as mapf:
         json.dump(nodemap, mapf, indent=2)
 
-def read(template_file, script_file):
+def read(template_file, pp_args):
     
     results = {} # (node_a, node_b) -> result: all are strings
 
@@ -63,9 +62,8 @@ def read(template_file, script_file):
     for out_file, (node_a, node_b) in nodemap.items():
         if not os.path.exists(out_file):
             pass
-            #results[node_a, node_b] = None # TODO: decide behaviour?
         else:
-            result = subprocess.run([script_file, out_file], capture_output=True, text=True).stdout.strip()
+            result = subprocess.run(pp_args + [out_file], capture_output=True, text=True).stdout.strip()
             results[node_a, node_b] = result
 
     # find all nodes:
@@ -96,8 +94,6 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'run':
         run(sys.argv[2])
     elif sys.argv[1] == 'read':
-        if len(sys.argv) < 4:
-            exit('Incorrect arguments, see docstring')
-        read(sys.argv[2], sys.argv[3])
+        read(sys.argv[2], sys.argv[3:])
     else:
         exit('Incorrect arguments, see docstring')
